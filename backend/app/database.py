@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -29,6 +30,17 @@ else:
     # PostgreSQL configuration, we don't pass connect_args
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
+=======
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./medico.db"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

@@ -1,4 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+<<<<<<< HEAD
+=======
+import { useUser } from '@clerk/react';
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 
 export interface User {
   id: string;
@@ -90,9 +94,13 @@ interface AppContextType {
   setActiveView: (view: 'census' | 'patient-portal' | 'patient-timeline' | 'patient-copilot' | 'patient-care-team' | 'patient-discharge' | 'patient-billing' | 'audit-logs' | 'roadmap' | 'backlog' | 'project-settings') => void;
   setUser: (user: User | null) => void;
   setActivePatient: (patient: Patient | null) => void;
+<<<<<<< HEAD
   loginUser: (email: string, password?: string) => Promise<boolean>;
   loginPatient: (email: string, password: string) => Promise<boolean>;
   registerPatient: (name: string, age: number, email: string, phone: string, password: string) => Promise<any>;
+=======
+  loginUser: (username: string) => Promise<boolean>;
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
   logoutUser: () => void;
   switchDemoRole: (role: 'PHYSICIAN' | 'NURSE' | 'SPECIALIST') => Promise<void>;
   refreshAllData: () => Promise<void>;
@@ -100,6 +108,18 @@ interface AppContextType {
   addNotification: (message: string, type: 'info' | 'success' | 'warning' | 'danger') => void;
   notifications: Array<{ id: string; message: string; type: string }>;
   
+<<<<<<< HEAD
+=======
+  // Clerk State & Helpers
+  tempClerkUser: any;
+  setTempClerkUser: (user: any) => void;
+  clerkSyncing: boolean;
+  clerkSyncError: string | null;
+  linkClerkPatient: (mrn: string) => Promise<boolean>;
+  linkClerkClinician: (username?: string, name?: string, role?: string, specialty?: string) => Promise<boolean>;
+  retryClerkSync: () => void;
+  
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
   // Bed Capacity & Project Settings
   reseedDatabase: () => Promise<boolean>;
   createBed: (bedNumber: string, department: 'ICU' | 'WARD') => Promise<boolean>;
@@ -110,6 +130,18 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+<<<<<<< HEAD
+=======
+// Internal sync helper that can safely use useUser only when rendered inside ClerkProvider
+const ClerkSyncHelper: React.FC<{ onSync: (user: any, loaded: boolean) => void; retryCount: number }> = ({ onSync, retryCount }) => {
+  const { user, isLoaded } = useUser();
+  useEffect(() => {
+    onSync(user, isLoaded);
+  }, [user, isLoaded, retryCount]);
+  return null;
+};
+
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const apiBaseUrl = 'http://127.0.0.1:5000/api';
   const [user, setUser] = useState<User | null>(null);
@@ -122,7 +154,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [loading, setLoading] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<Array<{ id: string; message: string; type: string }>>([]);
   
+<<<<<<< HEAD
 
+=======
+  // Clerk integration state
+  const [tempClerkUser, setTempClerkUser] = useState<any>(null);
+  const [clerkSyncing, setClerkSyncing] = useState<boolean>(false);
+  const [clerkSyncError, setClerkSyncError] = useState<string | null>(null);
+  const [clerkSyncRetryCount, setClerkSyncRetryCount] = useState(0);
+  const clerkSyncInFlightRef = React.useRef<boolean>(false);
+  const lastSyncedClerkIdRef = React.useRef<string | null>(null);
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 
   const addNotification = (message: string, type: 'info' | 'success' | 'warning' | 'danger') => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -158,6 +200,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     refreshAllData();
   }, []);
 
+<<<<<<< HEAD
   const loginUser = async (email: string, password?: string): Promise<boolean> => {
     try {
       const payload = password ? { email, password } : { username: email };
@@ -165,6 +208,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
+=======
+  const loginUser = async (username: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`${apiBaseUrl}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
       });
       const data = await res.json();
       if (res.ok) {
@@ -173,7 +224,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         refreshAllData();
         return true;
       } else {
+<<<<<<< HEAD
         addNotification(data.detail || data.error || 'Invalid credentials', 'danger');
+=======
+        addNotification(data.error || 'Invalid credentials', 'danger');
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
         return false;
       }
     } catch (e) {
@@ -182,6 +237,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+<<<<<<< HEAD
   const loginPatient = async (email: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch(`${apiBaseUrl}/auth/login-patient`, {
@@ -226,19 +282,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+=======
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
   const logoutUser = () => {
     setUser(null);
     setActivePatient(null);
     setActiveView('census');
+<<<<<<< HEAD
+=======
+    setTempClerkUser(null);
+    
+    // Clear Clerk session globally if available
+    if ((window as any).Clerk) {
+      try {
+        (window as any).Clerk.signOut();
+      } catch (err) {}
+    }
+    
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
     addNotification('Logged out successfully', 'info');
   };
 
   const switchDemoRole = async (role: 'PHYSICIAN' | 'NURSE' | 'SPECIALIST') => {
+<<<<<<< HEAD
     let email = 'deepak@medico.com';
     if (role === 'NURSE') email = 'harpal@medico.com';
     if (role === 'SPECIALIST') email = 'shalini@medico.com';
 
     await loginUser(email, 'password123');
+=======
+    let mockUsername = 'deepak';
+    if (role === 'NURSE') mockUsername = 'harpal';
+    if (role === 'SPECIALIST') mockUsername = 'shalini';
+
+    await loginUser(mockUsername);
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
   };
 
   const selectPatientById = async (id: string) => {
@@ -259,7 +337,67 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+<<<<<<< HEAD
 
+=======
+  // Link Clerk to Patient MRN
+  const linkClerkPatient = async (mrn: string): Promise<boolean> => {
+    if (!tempClerkUser) return false;
+    try {
+      const res = await fetch(`${apiBaseUrl}/auth/clerk-link-patient`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clerkId: tempClerkUser.id, mrn })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setUser(data.user);
+        setTempClerkUser(null);
+        addNotification(`Linked account to Patient MRN ${mrn}`, 'success');
+        await selectPatientById(data.patient.id);
+        return true;
+      } else {
+        addNotification(data.detail || 'Failed to link patient', 'danger');
+        return false;
+      }
+    } catch (e) {
+      addNotification('Connection error while linking patient', 'danger');
+      return false;
+    }
+  };
+
+  // Link Clerk to Clinician Profile
+  const linkClerkClinician = async (username?: string, name?: string, role?: string, specialty?: string): Promise<boolean> => {
+    if (!tempClerkUser) return false;
+    try {
+      const res = await fetch(`${apiBaseUrl}/auth/clerk-link-clinician`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clerkId: tempClerkUser.id,
+          username,
+          name,
+          role,
+          specialty
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setUser(data.user);
+        setTempClerkUser(null);
+        refreshAllData();
+        addNotification(`Welcome, ${data.user.name}`, 'success');
+        return true;
+      } else {
+        addNotification(data.detail || 'Failed to link clinician', 'danger');
+        return false;
+      }
+    } catch (e) {
+      addNotification('Connection error while linking clinician', 'danger');
+      return false;
+    }
+  };
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 
   // Reseed Database
   const reseedDatabase = async (): Promise<boolean> => {
@@ -393,6 +531,107 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+<<<<<<< HEAD
+=======
+  // Retry clerk sync (exposed to UI for manual retry)
+  const retryClerkSync = () => {
+    lastSyncedClerkIdRef.current = null;
+    clerkSyncInFlightRef.current = false;
+    setClerkSyncError(null);
+    setClerkSyncRetryCount(c => c + 1); // Bump counter to re-trigger ClerkSyncHelper
+  };
+
+  // Sync Clerk Authenticated User — with timeout, dedup, and error handling
+  const handleClerkSync = async (clerkUser: any, isLoaded: boolean) => {
+    if (!isLoaded) return;
+    
+    if (!clerkUser) {
+      // User is signed out of Clerk
+      setTempClerkUser(null);
+      setClerkSyncing(false);
+      setClerkSyncError(null);
+      lastSyncedClerkIdRef.current = null;
+      clerkSyncInFlightRef.current = false;
+      // Only reset local user session if they were logged in via Clerk
+      if (user && user.id.startsWith('user_')) {
+        setUser(null);
+        setActivePatient(null);
+        setActiveView('census');
+      }
+      return;
+    }
+
+    // Dedup: skip if already synced for this clerk user or if a sync is in flight
+    if (lastSyncedClerkIdRef.current === clerkUser.id || clerkSyncInFlightRef.current) return;
+    clerkSyncInFlightRef.current = true;
+
+    setClerkSyncing(true);
+    setClerkSyncError(null);
+
+    const portalType = sessionStorage.getItem('medico_portal_type') || 'clinician';
+    
+    // AbortController for 8-second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    
+    try {
+      const res = await fetch(`${apiBaseUrl}/auth/clerk-sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clerkId: clerkUser.id,
+          email: clerkUser.primaryEmailAddress?.emailAddress || '',
+          name: clerkUser.fullName || clerkUser.username || 'Clerk User',
+          portalType
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
+      const data = await res.json();
+      if (res.ok) {
+        lastSyncedClerkIdRef.current = clerkUser.id;
+        if (data.linked) {
+          setUser(data.user);
+          setTempClerkUser(null);
+          setClerkSyncError(null);
+          addNotification(`Welcome back, ${data.user.name}!`, 'success');
+          if (data.role === 'PATIENT') {
+            await selectPatientById(data.patient.id);
+          } else {
+            refreshAllData();
+          }
+        } else {
+          // Clerk user signed in but not yet linked in Medico DB
+          setTempClerkUser({
+            id: clerkUser.id,
+            name: clerkUser.fullName || clerkUser.username || 'Clerk User',
+            email: clerkUser.primaryEmailAddress?.emailAddress || '',
+            role: data.role
+          });
+          setUser(null); // Clear context user until EMR link is confirmed
+        }
+      } else {
+        setClerkSyncError('Server returned an error during sync. Please retry.');
+        addNotification('Clerk sync failed — server error.', 'warning');
+      }
+    } catch (e: any) {
+      clearTimeout(timeoutId);
+      if (e.name === 'AbortError') {
+        setClerkSyncError('Backend server timed out. Make sure the backend is running on port 5000.');
+        addNotification('Clerk sync timed out. Is the backend server running?', 'warning');
+      } else {
+        setClerkSyncError('Could not connect to clinical backend. Ensure the server is running.');
+        addNotification('Cannot reach clinical backend server.', 'danger');
+      }
+      console.error('Clerk session synchronization failed:', e);
+    } finally {
+      setClerkSyncing(false);
+      clerkSyncInFlightRef.current = false;
+    }
+  };
+
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
   return (
     <AppContext.Provider
       value={{
@@ -410,14 +649,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setUser,
         setActivePatient,
         loginUser,
+<<<<<<< HEAD
         loginPatient,
         registerPatient,
+=======
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
         logoutUser,
         switchDemoRole,
         refreshAllData,
         selectPatientById,
         addNotification,
         notifications,
+<<<<<<< HEAD
+=======
+        tempClerkUser,
+        setTempClerkUser,
+        clerkSyncing,
+        clerkSyncError,
+        linkClerkPatient,
+        linkClerkClinician,
+        retryClerkSync,
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
         reseedDatabase,
         createBed,
         deleteBed,
@@ -425,6 +677,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updatePatientRoadmap
       }}
     >
+<<<<<<< HEAD
+=======
+      {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY && (
+        <ClerkSyncHelper onSync={handleClerkSync} retryCount={clerkSyncRetryCount} />
+      )}
+>>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
       {children}
     </AppContext.Provider>
   );
