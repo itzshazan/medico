@@ -94,3 +94,15 @@ class AuditLogResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class PatientRegisterRequest(BaseModel):
+    name: str
+    age: int
+    email: str
+    phone: str
+    password: str
+
+class PatientLoginRequest(BaseModel):
+    email: str
+    password: str
+

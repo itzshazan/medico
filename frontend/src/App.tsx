@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useApp } from './context/AppContext';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
 import { Login } from './pages/Login';
+import { LandingPage } from './pages/LandingPage';
 import { CensusDashboard } from './pages/CensusDashboard';
 import { PatientPortal } from './pages/PatientPortal';
 import { AuditLogPage } from './pages/AuditLogPage';
@@ -11,9 +13,14 @@ import { ProjectSettings } from './pages/ProjectSettings';
 
 function App() {
   const { user, activeView, notifications } = useApp();
+  const [showLanding, setShowLanding] = useState(true);
 
-  // Redirect to Login if no active user session
+  // Show Landing Page → Login flow when no active user session
   if (!user) {
+    if (showLanding) {
+      return <LandingPage onEnterApp={() => setShowLanding(false)} />;
+    }
+
     return (
       <>
         <Login />
