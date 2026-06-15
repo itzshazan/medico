@@ -128,7 +128,7 @@ const ClerkSyncHelper: React.FC<{ onSync: (user: any, loaded: boolean) => void; 
   return null;
 };
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const apiBaseUrl = 'http://127.0.0.1:5000/api';
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
   const [user, setUser] = useState<User | null>(null);
   const [activePatient, setActivePatient] = useState<Patient | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
