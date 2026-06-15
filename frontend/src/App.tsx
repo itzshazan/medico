@@ -1,15 +1,9 @@
-<<<<<<< HEAD
 import { useState } from 'react';
-=======
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 import { useApp } from './context/AppContext';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
 import { Login } from './pages/Login';
-<<<<<<< HEAD
 import { LandingPage } from './pages/LandingPage';
-=======
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 import { CensusDashboard } from './pages/CensusDashboard';
 import { PatientPortal } from './pages/PatientPortal';
 import { AuditLogPage } from './pages/AuditLogPage';
@@ -19,7 +13,6 @@ import { ProjectSettings } from './pages/ProjectSettings';
 
 function App() {
   const { user, activeView, notifications } = useApp();
-<<<<<<< HEAD
   const [showLanding, setShowLanding] = useState(true);
 
   // Show Landing Page → Login flow when no active user session
@@ -27,12 +20,6 @@ function App() {
     if (showLanding) {
       return <LandingPage onEnterApp={() => setShowLanding(false)} />;
     }
-
-=======
-
-  // Redirect to Login if no active user session
-  if (!user) {
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
     return (
       <>
         <Login />

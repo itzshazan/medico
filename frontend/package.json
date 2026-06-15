@@ -10,10 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
-=======
     "@clerk/react": "^6.9.1",
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },

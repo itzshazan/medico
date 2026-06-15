@@ -25,24 +25,18 @@ def seed_db():
                 name="Dr. Deepak R.",
                 role="PHYSICIAN",
                 specialty="Pulmonology",
-<<<<<<< HEAD
                 email="deepak@medico.com",
-                password="password123"
-=======
+                password="password123",
                 clerk_id=None
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
             ),
             User(
                 id=str(uuid.uuid4()),
                 username="harpal",
                 name="Nurse Harpal S.",
                 role="NURSE",
-<<<<<<< HEAD
                 email="harpal@medico.com",
-                password="password123"
-=======
+                password="password123",
                 clerk_id=None
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
             ),
             User(
                 id=str(uuid.uuid4()),
@@ -50,12 +44,9 @@ def seed_db():
                 name="Dr. Shalini K.",
                 role="SPECIALIST",
                 specialty="Nephrology",
-<<<<<<< HEAD
                 email="shalini@medico.com",
-                password="password123"
-=======
+                password="password123",
                 clerk_id=None
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
             )
         ]
         for u in users:
@@ -96,10 +87,7 @@ def seed_db():
             bed_number="ICU-3",
             admission_date=datetime.utcnow() - timedelta(days=3),
             discharge_date=None,
-<<<<<<< HEAD
-=======
             clerk_id=None,
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
             estimated_discharge_date=datetime.utcnow() + timedelta(days=4),
             milestones=sample_milestones
         )

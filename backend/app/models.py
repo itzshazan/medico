@@ -11,12 +11,9 @@ class User(Base):
     name = Column(String)
     role = Column(String)  # 'PHYSICIAN', 'NURSE', 'SPECIALIST'
     specialty = Column(String, nullable=True)  # e.g., 'Pulmonology', 'Nephrology'
-<<<<<<< HEAD
     email = Column(String, unique=True, index=True, nullable=True)
     password = Column(String, nullable=True)
-=======
     clerk_id = Column(String, unique=True, nullable=True)
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
     created_at = Column(DateTime, default=func.now())
 
 class Patient(Base):
@@ -32,15 +29,11 @@ class Patient(Base):
     bed_number = Column(String, nullable=True)
     admission_date = Column(DateTime, default=func.now())
     discharge_date = Column(DateTime, nullable=True)
-<<<<<<< HEAD
     estimated_discharge_date = Column(DateTime, nullable=True)
     email = Column(String, unique=True, nullable=True)
     password = Column(String, nullable=True)
     phone = Column(String, nullable=True)
-=======
     clerk_id = Column(String, unique=True, nullable=True)
-    estimated_discharge_date = Column(DateTime, nullable=True)
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
     milestones = Column(String, nullable=True)  # JSON string representing milestones
     created_at = Column(DateTime, default=func.now())
 

@@ -1,8 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-<<<<<<< HEAD
-=======
 import { useUser } from '@clerk/react';
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 
 export interface User {
   id: string;
@@ -94,13 +91,9 @@ interface AppContextType {
   setActiveView: (view: 'census' | 'patient-portal' | 'patient-timeline' | 'patient-copilot' | 'patient-care-team' | 'patient-discharge' | 'patient-billing' | 'audit-logs' | 'roadmap' | 'backlog' | 'project-settings') => void;
   setUser: (user: User | null) => void;
   setActivePatient: (patient: Patient | null) => void;
-<<<<<<< HEAD
   loginUser: (email: string, password?: string) => Promise<boolean>;
   loginPatient: (email: string, password: string) => Promise<boolean>;
-  registerPatient: (name: string, age: number, email: string, phone: string, password: string) => Promise<any>;
-=======
-  loginUser: (username: string) => Promise<boolean>;
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
+  registerPatient: (name: string, age: number, gender: string, email: string, phone: string, password: string) => Promise<any>;
   logoutUser: () => void;
   switchDemoRole: (role: 'PHYSICIAN' | 'NURSE' | 'SPECIALIST') => Promise<void>;
   refreshAllData: () => Promise<void>;
@@ -108,8 +101,6 @@ interface AppContextType {
   addNotification: (message: string, type: 'info' | 'success' | 'warning' | 'danger') => void;
   notifications: Array<{ id: string; message: string; type: string }>;
   
-<<<<<<< HEAD
-=======
   // Clerk State & Helpers
   tempClerkUser: any;
   setTempClerkUser: (user: any) => void;
@@ -118,8 +109,6 @@ interface AppContextType {
   linkClerkPatient: (mrn: string) => Promise<boolean>;
   linkClerkClinician: (username?: string, name?: string, role?: string, specialty?: string) => Promise<boolean>;
   retryClerkSync: () => void;
-  
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
   // Bed Capacity & Project Settings
   reseedDatabase: () => Promise<boolean>;
   createBed: (bedNumber: string, department: 'ICU' | 'WARD') => Promise<boolean>;
@@ -130,8 +119,6 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-<<<<<<< HEAD
-=======
 // Internal sync helper that can safely use useUser only when rendered inside ClerkProvider
 const ClerkSyncHelper: React.FC<{ onSync: (user: any, loaded: boolean) => void; retryCount: number }> = ({ onSync, retryCount }) => {
   const { user, isLoaded } = useUser();
@@ -140,8 +127,6 @@ const ClerkSyncHelper: React.FC<{ onSync: (user: any, loaded: boolean) => void; 
   }, [user, isLoaded, retryCount]);
   return null;
 };
-
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const apiBaseUrl = 'http://127.0.0.1:5000/api';
   const [user, setUser] = useState<User | null>(null);
@@ -154,9 +139,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [loading, setLoading] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<Array<{ id: string; message: string; type: string }>>([]);
   
-<<<<<<< HEAD
-
-=======
   // Clerk integration state
   const [tempClerkUser, setTempClerkUser] = useState<any>(null);
   const [clerkSyncing, setClerkSyncing] = useState<boolean>(false);
@@ -164,7 +146,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [clerkSyncRetryCount, setClerkSyncRetryCount] = useState(0);
   const clerkSyncInFlightRef = React.useRef<boolean>(false);
   const lastSyncedClerkIdRef = React.useRef<string | null>(null);
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 
   const addNotification = (message: string, type: 'info' | 'success' | 'warning' | 'danger') => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -200,7 +181,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     refreshAllData();
   }, []);
 
-<<<<<<< HEAD
   const loginUser = async (email: string, password?: string): Promise<boolean> => {
     try {
       const payload = password ? { email, password } : { username: email };
@@ -208,14 +188,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-=======
-  const loginUser = async (username: string): Promise<boolean> => {
-    try {
-      const res = await fetch(`${apiBaseUrl}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
       });
       const data = await res.json();
       if (res.ok) {
@@ -224,11 +196,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         refreshAllData();
         return true;
       } else {
-<<<<<<< HEAD
         addNotification(data.detail || data.error || 'Invalid credentials', 'danger');
-=======
-        addNotification(data.error || 'Invalid credentials', 'danger');
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
         return false;
       }
     } catch (e) {
@@ -237,7 +205,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-<<<<<<< HEAD
   const loginPatient = async (email: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch(`${apiBaseUrl}/auth/login-patient`, {
@@ -261,12 +228,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const registerPatient = async (name: string, age: number, email: string, phone: string, password: string): Promise<any> => {
+  const registerPatient = async (name: string, age: number, gender: string, email: string, phone: string, password: string): Promise<any> => {
     try {
       const res = await fetch(`${apiBaseUrl}/auth/register-patient`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, age, email, phone, password })
+        body: JSON.stringify({ name, age, gender, email, phone, password })
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -281,15 +248,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return null;
     }
   };
-
-=======
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
   const logoutUser = () => {
     setUser(null);
     setActivePatient(null);
     setActiveView('census');
-<<<<<<< HEAD
-=======
     setTempClerkUser(null);
     
     // Clear Clerk session globally if available
@@ -298,25 +260,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         (window as any).Clerk.signOut();
       } catch (err) {}
     }
-    
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
     addNotification('Logged out successfully', 'info');
   };
 
   const switchDemoRole = async (role: 'PHYSICIAN' | 'NURSE' | 'SPECIALIST') => {
-<<<<<<< HEAD
     let email = 'deepak@medico.com';
     if (role === 'NURSE') email = 'harpal@medico.com';
     if (role === 'SPECIALIST') email = 'shalini@medico.com';
 
     await loginUser(email, 'password123');
-=======
-    let mockUsername = 'deepak';
-    if (role === 'NURSE') mockUsername = 'harpal';
-    if (role === 'SPECIALIST') mockUsername = 'shalini';
-
-    await loginUser(mockUsername);
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
   };
 
   const selectPatientById = async (id: string) => {
@@ -337,9 +289,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-<<<<<<< HEAD
-
-=======
   // Link Clerk to Patient MRN
   const linkClerkPatient = async (mrn: string): Promise<boolean> => {
     if (!tempClerkUser) return false;
@@ -397,7 +346,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return false;
     }
   };
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 
   // Reseed Database
   const reseedDatabase = async (): Promise<boolean> => {
@@ -531,8 +479,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-<<<<<<< HEAD
-=======
   // Retry clerk sync (exposed to UI for manual retry)
   const retryClerkSync = () => {
     lastSyncedClerkIdRef.current = null;
@@ -630,8 +576,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       clerkSyncInFlightRef.current = false;
     }
   };
-
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
   return (
     <AppContext.Provider
       value={{
@@ -649,19 +593,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setUser,
         setActivePatient,
         loginUser,
-<<<<<<< HEAD
         loginPatient,
         registerPatient,
-=======
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
         logoutUser,
         switchDemoRole,
         refreshAllData,
         selectPatientById,
         addNotification,
         notifications,
-<<<<<<< HEAD
-=======
         tempClerkUser,
         setTempClerkUser,
         clerkSyncing,
@@ -669,7 +608,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         linkClerkPatient,
         linkClerkClinician,
         retryClerkSync,
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
         reseedDatabase,
         createBed,
         deleteBed,
@@ -677,12 +615,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updatePatientRoadmap
       }}
     >
-<<<<<<< HEAD
-=======
       {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY && (
         <ClerkSyncHelper onSync={handleClerkSync} retryCount={clerkSyncRetryCount} />
       )}
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
       {children}
     </AppContext.Provider>
   );

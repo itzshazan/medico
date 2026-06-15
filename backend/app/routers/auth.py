@@ -1,17 +1,10 @@
 import uuid
-<<<<<<< HEAD
 import random
-=======
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import User, Patient, AuditLog
-<<<<<<< HEAD
 from ..schemas import UserResponse, PatientRegisterRequest, PatientLoginRequest
-=======
-from ..schemas import UserResponse
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -20,7 +13,6 @@ class LoginRequest(UserResponse):
 
 @router.post("/login")
 def login(payload: dict, db: Session = Depends(get_db)):
-<<<<<<< HEAD
     email = payload.get("email")
     password = payload.get("password")
     username = payload.get("username")
@@ -35,15 +27,6 @@ def login(payload: dict, db: Session = Depends(get_db)):
             raise HTTPException(status_code=401, detail="Invalid username")
     else:
         raise HTTPException(status_code=400, detail="Email/password or username is required")
-=======
-    username = payload.get("username")
-    if not username:
-        raise HTTPException(status_code=400, detail="Username is required")
-        
-    user = db.query(User).filter(User.username == username.lower()).first()
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid username")
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
         
     # Log audit
     audit = AuditLog(
@@ -78,7 +61,6 @@ def get_users(db: Session = Depends(get_db)):
         "specialty": u.specialty
     } for u in users]
 
-<<<<<<< HEAD
 @router.post("/register-patient")
 def register_patient(req: PatientRegisterRequest, db: Session = Depends(get_db)):
     # Check if email already registered
@@ -101,7 +83,7 @@ def register_patient(req: PatientRegisterRequest, db: Session = Depends(get_db))
         mrn=mrn,
         name=req.name,
         age=req.age,
-        gender="Unknown",  # Default placeholder
+        gender=req.gender,
         comorbidities="No baseline comorbidities entered.",
         status="ACTIVE_CARE",  # Register puts them directly in EMR Active Care status
         bed_number=None,
@@ -156,7 +138,21 @@ def login_patient(req: PatientLoginRequest, db: Session = Depends(get_db)):
         user_role="PATIENT",
         action="LOGIN",
         details=f"Logged in via Patient Portal as {patient.name}"
-=======
+    )
+    db.add(audit)
+    db.commit()
+    
+    return {
+        "success": True,
+        "user": {
+            "id": f"sandbox_{patient.id}",
+            "username": patient.mrn,
+            "name": patient.name,
+            "role": "PATIENT",
+            "linkedPatientId": patient.id
+        }
+    }
+
 @router.post("/clerk-sync")
 def clerk_sync(payload: dict, db: Session = Depends(get_db)):
     clerk_id = payload.get("clerkId")
@@ -235,17 +231,12 @@ def clerk_link_patient(payload: dict, db: Session = Depends(get_db)):
         user_role="PATIENT",
         action="LOGIN",
         details=f"Linked Clerk account {clerk_id} to Patient MRN {mrn}"
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
     )
     db.add(audit)
     db.commit()
     
     return {
         "success": True,
-<<<<<<< HEAD
-        "user": {
-            "id": f"sandbox_{patient.id}",
-=======
         "role": "PATIENT",
         "patient": {
             "id": patient.id,
@@ -256,7 +247,6 @@ def clerk_link_patient(payload: dict, db: Session = Depends(get_db)):
         },
         "user": {
             "id": clerk_id,
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
             "username": patient.mrn,
             "name": patient.name,
             "role": "PATIENT",
@@ -264,8 +254,6 @@ def clerk_link_patient(payload: dict, db: Session = Depends(get_db)):
         }
     }
 
-<<<<<<< HEAD
-=======
 @router.post("/clerk-link-clinician")
 def clerk_link_clinician(payload: dict, db: Session = Depends(get_db)):
     clerk_id = payload.get("clerkId")
@@ -325,8 +313,6 @@ def clerk_link_clinician(payload: dict, db: Session = Depends(get_db)):
             "specialty": user.specialty
         }
     }
-
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
 @router.post("/reset-db")
 def reset_db():
     import os

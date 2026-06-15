@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-<<<<<<< HEAD
-=======
 import { Show, SignInButton, SignUpButton, UserButton, useAuth } from '@clerk/react';
 
 const ClerkControlSection: React.FC<{ activePortal: 'CLINICIAN' | 'PATIENT' }> = ({ activePortal }) => {
@@ -119,15 +117,15 @@ const ClerkControlSection: React.FC<{ activePortal: 'CLINICIAN' | 'PATIENT' }> =
   );
 };
 
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
-
 export const Login: React.FC = () => {
   const { 
     apiBaseUrl, 
     loginUser, 
-<<<<<<< HEAD
     loginPatient,
     registerPatient,
+    tempClerkUser, 
+    linkClerkPatient, 
+    linkClerkClinician, 
     setUser,
     setActivePatient,
     setActiveView,
@@ -147,9 +145,9 @@ export const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Registration Form State
   const [regName, setRegName] = useState('');
   const [regAge, setRegAge] = useState('');
+  const [regGender, setRegGender] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPhone, setRegPhone] = useState('');
   const [regPassword, setRegPassword] = useState('');
@@ -166,35 +164,6 @@ export const Login: React.FC = () => {
   const [showClinicianPassword, setShowClinicianPassword] = useState(false);
   const [clinicianRemember, setClinicianRemember] = useState(false);
 
-  // Clinician Email/Password Login
-  const handleClinicianEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!clinicianEmail || !clinicianPassword) return;
-    setIsSubmitting(true);
-    sessionStorage.setItem('medico_portal_type', 'clinician');
-    await loginUser(clinicianEmail, clinicianPassword);
-    setIsSubmitting(false);
-  };
-
-
-
-  // Quick MRN Access (Patient)
-  const handleMockPatientLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!mrnInput) return;
-    setIsSubmitting(true);
-=======
-    tempClerkUser, 
-    linkClerkPatient, 
-    linkClerkClinician, 
-    setUser,
-    setActivePatient,
-    setActiveView,
-    addNotification
-  } = useApp();
-
-  const [activePortal, setActivePortal] = useState<'CLINICIAN' | 'PATIENT'>('CLINICIAN');
-  const [mrnInput, setMrnInput] = useState('');
   const [clinicianLinkMethod, setClinicianLinkMethod] = useState<'EXISTING' | 'NEW'>('EXISTING');
   
   // Custom clinician profile link fields
@@ -211,10 +180,21 @@ export const Login: React.FC = () => {
     await loginUser(username);
   };
 
+  // Clinician Email/Password Login
+  const handleClinicianEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clinicianEmail || !clinicianPassword) return;
+    setIsSubmitting(true);
+    sessionStorage.setItem('medico_portal_type', 'clinician');
+    await loginUser(clinicianEmail, clinicianPassword);
+    setIsSubmitting(false);
+  };
+
+  // Quick MRN Access (Patient)
   const handleMockPatientLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!mrnInput) return;
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
+    setIsSubmitting(true);
     
     try {
       const res = await fetch(`${apiBaseUrl}/patients`);
@@ -229,10 +209,7 @@ export const Login: React.FC = () => {
           linkedPatientId: match.id
         });
         
-<<<<<<< HEAD
-=======
         // Fetch detailed record
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
         const detailRes = await fetch(`${apiBaseUrl}/patients/${match.id}`);
         const patientDetail = await detailRes.json();
         setActivePatient(patientDetail);
@@ -243,7 +220,6 @@ export const Login: React.FC = () => {
       }
     } catch (err) {
       addNotification('Sandbox database offline', 'danger');
-<<<<<<< HEAD
     } finally {
       setIsSubmitting(false);
     }
@@ -258,16 +234,15 @@ export const Login: React.FC = () => {
     setIsSubmitting(false);
   };
 
-  // Patient Registration
   const handlePatientRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!regName || !regAge || !regEmail || !regPhone || !regPassword) return;
+    if (!regName || !regAge || !regGender || !regEmail || !regPhone || !regPassword) return;
     if (!agreeTerms) {
       addNotification('Please agree to the Terms of Service & Privacy Policy.', 'warning');
       return;
     }
     setIsSubmitting(true);
-    const res = await registerPatient(regName, parseInt(regAge), regEmail, regPhone, regPassword);
+    const res = await registerPatient(regName, parseInt(regAge), regGender, regEmail, regPhone, regPassword);
     setIsSubmitting(false);
     if (res && res.success) {
       setRegistrationSuccess({
@@ -276,7 +251,6 @@ export const Login: React.FC = () => {
         user: res.user,
         patientId: res.patient.id
       });
-=======
     }
   };
 
@@ -296,13 +270,11 @@ export const Login: React.FC = () => {
         return;
       }
       await linkClerkClinician(undefined, newClinicianName, newClinicianRole, newClinicianSpecialty);
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
     }
   };
 
   const handlePortalChange = (portal: 'CLINICIAN' | 'PATIENT') => {
     setActivePortal(portal);
-<<<<<<< HEAD
     setPatientAuthMode('MRN');
     sessionStorage.setItem('medico_portal_type', portal.toLowerCase());
   };
@@ -633,6 +605,24 @@ export const Login: React.FC = () => {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Gender</label>
+                  <div style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: '12px', top: '10px', color: 'var(--text-muted)' }}>👥</span>
+                    <select 
+                      style={{ width: '100%', height: '38px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '8px 12px 8px 36px', background: '#ffffff', color: '#1e293b', fontSize: '0.85rem' }}
+                      value={regGender}
+                      onChange={(e) => setRegGender(e.target.value)}
+                      required
+                    >
+                      <option value="" disabled hidden>Select your gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Email Address</label>
                   <div style={{ position: 'relative' }}>
                     <span style={{ position: 'absolute', left: '12px', top: '10px', color: 'var(--text-muted)' }}>✉️</span>
@@ -722,7 +712,7 @@ export const Login: React.FC = () => {
 
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '10px', marginTop: '2px' }}>
                   <span 
-                    onClick={() => { setPatientAuthMode('MRN'); setRegName(''); setRegAge(''); setRegEmail(''); setRegPhone(''); setRegPassword(''); }}
+                    onClick={() => { setPatientAuthMode('MRN'); setRegName(''); setRegAge(''); setRegGender(''); setRegEmail(''); setRegPhone(''); setRegPassword(''); }}
                     style={{ fontSize: '0.78rem', color: 'var(--text-muted)', cursor: 'pointer', fontWeight: 600 }}
                   >
                     ⬅ Go Back to Quick MRN Access
@@ -736,12 +726,6 @@ export const Login: React.FC = () => {
     );
   }
 
-  // STANDARD LOG IN VIEW (CLINICIAN OR PATIENT QUICK MRN PORTAL)
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', width: '100vw', background: 'var(--bg-secondary)', padding: '24px', fontFamily: 'var(--font-family)' }}>
-=======
-    sessionStorage.setItem('medico_portal_type', portal.toLowerCase());
-  };
 
   // Onboarding screen: Link Clerk to EMR (triggered when Clerk is authenticated but not linked)
   if (tempClerkUser) {
@@ -869,7 +853,6 @@ export const Login: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', width: '100vw', background: 'var(--bg-secondary)', padding: '24px' }}>
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
       <div className="glass-panel" style={{ maxWidth: '480px', width: '100%', padding: '40px', textAlign: 'center', borderRadius: 'var(--radius-lg)' }}>
         
         {/* Logo Section */}
@@ -895,11 +878,7 @@ export const Login: React.FC = () => {
         </div>
 
         {/* Portal selector tabs */}
-<<<<<<< HEAD
-        <div style={{ display: 'flex', background: 'var(--bg-tertiary)', padding: '4px', borderRadius: 'var(--radius-md)', marginBottom: '24px' }}>
-=======
         <div style={{ display: 'flex', background: 'var(--bg-tertiary)', padding: '4px', borderRadius: 'var(--radius-md)', marginBottom: '32px' }}>
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
           <button 
             onClick={() => handlePortalChange('CLINICIAN')}
             style={{ 
@@ -914,11 +893,7 @@ export const Login: React.FC = () => {
               transition: 'background 0.15s'
             }}
           >
-<<<<<<< HEAD
-            🧑‍⚕️ Clinician Login
-=======
             👨‍⚕️ Clinician Login
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
           </button>
           <button 
             onClick={() => handlePortalChange('PATIENT')}
@@ -938,213 +913,135 @@ export const Login: React.FC = () => {
           </button>
         </div>
 
-<<<<<<< HEAD
-        {activePortal === 'CLINICIAN' ? (
-          /* ============ CLINICIAN EMAIL/PASSWORD LOGIN ============ */
-          <form onSubmit={handleClinicianEmailLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
-            <div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-display)', textAlign: 'center', marginBottom: '16px' }}>Clinician Login</h2>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#172b4d' }}>Email Address</label>
-              <input 
-                type="email" 
-                style={{ width: '100%', height: '44px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 14px', background: '#ffffff', color: '#1e293b', fontSize: '0.9rem' }}
-                placeholder="Enter your email address"
-                value={clinicianEmail}
-                onChange={(e) => setClinicianEmail(e.target.value)}
-                required
-              />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#172b4d' }}>Password</label>
-              <div style={{ position: 'relative' }}>
-                <input 
-                  type={showClinicianPassword ? "text" : "password"} 
-                  style={{ width: '100%', height: '44px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 44px 10px 14px', background: '#ffffff', color: '#1e293b', fontSize: '0.9rem' }}
-                  placeholder="Enter your password"
-                  value={clinicianPassword}
-                  onChange={(e) => setClinicianPassword(e.target.value)}
-                  required
-                />
-                <button 
-                  type="button" 
-                  onClick={() => setShowClinicianPassword(!showClinicianPassword)}
-                  style={{ position: 'absolute', right: '14px', top: '12px', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1rem' }}
-                >
-                  {showClinicianPassword ? "👁️" : "👁️‍🗨️"}
-                </button>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={clinicianRemember} 
-                  onChange={(e) => setClinicianRemember(e.target.checked)}
-                  style={{ width: '16px', height: '16px', accentColor: 'var(--color-blue)', cursor: 'pointer' }}
-                />
-                Remember me
-              </label>
-              <a href="#" onClick={(e) => { e.preventDefault(); addNotification("Please contact hospital IT department to retrieve clinician credentials.", "info"); }} style={{ fontSize: '0.85rem', color: 'var(--color-blue)', fontWeight: 600, textDecoration: 'none' }}>
-                Forgot Password?
-              </a>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={isSubmitting}
-              className="btn btn-primary" 
-              style={{ width: '100%', height: '44px', fontSize: '0.95rem', fontWeight: 700, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '12px', background: '#0052cc', border: 'none', color: '#ffffff', cursor: 'pointer' }}
-            >
-              {isSubmitting ? (
-                <div style={{ width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} />
-              ) : (
-                <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(180deg)' }}>
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                  </svg>
-                  Login
-                </>
-              )}
-            </button>
-
-          </form>
-        ) : (
-          /* ============ PATIENT QUICK MRN PORTAL WITH SUB-TOGGLES ============ */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {/* Sub-Toggles (Login / Register) */}
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button 
-                onClick={() => setPatientAuthMode('LOGIN')}
-                style={{
-                  flex: 1,
-                  height: '40px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: 'var(--color-cyan)',
-                  color: '#ffffff',
-                  fontWeight: 700,
-                  fontSize: '0.880rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                }}
-              >
-                <span>🚪</span> Login
-              </button>
-              
-              <button 
-                onClick={() => setPatientAuthMode('REGISTER')}
-                style={{
-                  flex: 1,
-                  height: '40px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--color-cyan)',
-                  background: '#ffffff',
-                  color: 'var(--color-cyan)',
-                  fontWeight: 700,
-                  fontSize: '0.880rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <span>👤+</span> Register
-              </button>
-            </div>
-
-            <form onSubmit={handleMockPatientLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px', borderTop: '1px solid var(--glass-border)', paddingTop: '20px' }}>
-              <div style={{ textAlign: 'left' }}>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>Patient MRN</label>
-                <input 
-                  type="text" 
-                  className="search-input"
-                  style={{ width: '100%', height: '40px', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-md)', padding: '8px 12px', background: '#ffffff', color: 'var(--text-primary)' }}
-                  placeholder="Enter MRN (e.g. MRN-948273)"
-                  value={mrnInput}
-                  onChange={(e) => setMrnInput(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <button type="submit" disabled={isSubmitting} className="btn btn-secondary" style={{ width: '100%', height: '40px', fontWeight: 600, fontSize: '0.9rem', background: '#f8fafc', border: '1px solid var(--glass-border)', color: '#172b4d' }}>
-                {isSubmitting ? 'Verifying MRN...' : 'Access Patient Portal'}
-              </button>
-            </form>
-=======
-        {/* Clerk vs Sandbox bypass UI */}
         {hasClerkKey ? (
           <ClerkControlSection activePortal={activePortal} />
         ) : (
-          /* Sandbox mode bypass */
-          <div>
-            <div style={{ 
-              background: '#fff3cd', 
-              color: '#856404', 
-              padding: '12px 16px', 
-              borderRadius: 'var(--radius-md)', 
-              fontSize: '0.75rem', 
-              textAlign: 'left', 
-              border: '1px solid #ffeeba',
-              marginBottom: '24px',
-              lineHeight: '1.4'
-            }}>
-              <strong>⚠️ Clerk Sandbox Bypass Mode Active</strong>
-              <div style={{ marginTop: '4px' }}>VITE_CLERK_PUBLISHABLE_KEY is not defined in the environment. Local database credentials are active for developer verification.</div>
-            </div>
+          /* Sandbox mode bypass / Local Forms */
+          activePortal === 'CLINICIAN' ? (
+            /* Clinician login form */
+            <form onSubmit={handleClinicianEmailLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
+              <div>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-display)', textAlign: 'center', marginBottom: '16px' }}>Clinician Login</h2>
+              </div>
 
-            {activePortal === 'CLINICIAN' ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#172b4d' }}>Email Address</label>
+                <input 
+                  type="email" 
+                  style={{ width: '100%', height: '44px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 14px', background: '#ffffff', color: '#1e293b', fontSize: '0.9rem' }}
+                  placeholder="Enter your email address"
+                  value={clinicianEmail}
+                  onChange={(e) => setClinicianEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#172b4d' }}>Password</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type={showClinicianPassword ? "text" : "password"} 
+                    style={{ width: '100%', height: '44px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 44px 10px 14px', background: '#ffffff', color: '#1e293b', fontSize: '0.9rem' }}
+                    placeholder="Enter your password"
+                    value={clinicianPassword}
+                    onChange={(e) => setClinicianPassword(e.target.value)}
+                    required
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowClinicianPassword(!showClinicianPassword)}
+                    style={{ position: 'absolute', right: '14px', top: '12px', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1rem' }}
+                  >
+                    {showClinicianPassword ? "👁️" : "👁️‍🗨️"}
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={clinicianRemember} 
+                    onChange={(e) => setClinicianRemember(e.target.checked)}
+                    style={{ width: '16px', height: '16px', accentColor: 'var(--color-blue)', cursor: 'pointer' }}
+                  />
+                  Remember me
+                </label>
+                <a href="#" onClick={(e) => { e.preventDefault(); addNotification("Please contact hospital IT department to retrieve clinician credentials.", "info"); }} style={{ fontSize: '0.85rem', color: 'var(--color-blue)', fontWeight: 600, textDecoration: 'none' }}>
+                  Forgot Password?
+                </a>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="btn btn-primary" 
+                style={{ width: '100%', height: '44px', fontSize: '0.95rem', fontWeight: 700, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '12px', background: '#0052cc', border: 'none', color: '#ffffff', cursor: 'pointer' }}
+              >
+                {isSubmitting ? (
+                  <div style={{ width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} />
+                ) : (
+                  <>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(180deg)' }}>
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                      <polyline points="16 17 21 12 16 7"></polyline>
+                      <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Login
+                  </>
+                )}
+              </button>
+            </form>
+          ) : (
+            /* Patient portal quick MRN access + sub-toggles */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
                 <button 
-                  className="btn" 
-                  style={{ width: '100%', justifyContent: 'flex-start', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', boxShadow: 'none' }}
-                  onClick={() => handleMockClinicianLogin('deepak')}
+                  onClick={() => setPatientAuthMode('LOGIN')}
+                  style={{
+                    flex: 1,
+                    height: '40px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: 'var(--color-cyan)',
+                    color: '#ffffff',
+                    fontWeight: 700,
+                    fontSize: '0.880rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                  }}
                 >
-                  <span style={{ fontSize: '1.5rem', marginRight: '12px' }}>🩺</span>
-                  <div style={{ textAlign: 'left' }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Attending Physician Portal</div>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Dr. Deepak R. (Pulmonology)</div>
-                  </div>
+                  <span>🚪</span> Login
                 </button>
-
+                
                 <button 
-                  className="btn" 
-                  style={{ width: '100%', justifyContent: 'flex-start', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', boxShadow: 'none' }}
-                  onClick={() => handleMockClinicianLogin('harpal')}
+                  onClick={() => setPatientAuthMode('REGISTER')}
+                  style={{
+                    flex: 1,
+                    height: '40px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--color-cyan)',
+                    background: '#ffffff',
+                    color: 'var(--color-cyan)',
+                    fontWeight: 700,
+                    fontSize: '0.880rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
                 >
-                  <span style={{ fontSize: '1.5rem', marginRight: '12px' }}>🧑‍⚕️</span>
-                  <div style={{ textAlign: 'left' }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>ICU Nursing Station</div>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Nurse Harpal S. (Critical Care)</div>
-                  </div>
-                </button>
-
-                <button 
-                  className="btn" 
-                  style={{ width: '100%', justifyContent: 'flex-start', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', boxShadow: 'none' }}
-                  onClick={() => handleMockClinicianLogin('shalini')}
-                >
-                  <span style={{ fontSize: '1.5rem', marginRight: '12px' }}>🔬</span>
-                  <div style={{ textAlign: 'left' }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Consulting Specialist Portal</div>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Dr. Shalini K. (Nephrology)</div>
-                  </div>
+                  <span>👤+</span> Register
                 </button>
               </div>
-            ) : (
-              <form onSubmit={handleMockPatientLogin}>
-                <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+
+              <form onSubmit={handleMockPatientLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px', borderTop: '1px solid var(--glass-border)', paddingTop: '20px' }}>
+                <div style={{ textAlign: 'left' }}>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>Patient MRN</label>
                   <input 
                     type="text" 
@@ -1156,13 +1053,13 @@ export const Login: React.FC = () => {
                     required
                   />
                 </div>
-                <button type="submit" className="btn btn-secondary" style={{ width: '100%', height: '40px', fontWeight: 600, fontSize: '0.9rem' }}>
-                  Access Patient Portal
+                
+                <button type="submit" disabled={isSubmitting} className="btn btn-secondary" style={{ width: '100%', height: '40px', fontWeight: 600, fontSize: '0.9rem', background: '#f8fafc', border: '1px solid var(--glass-border)', color: '#172b4d' }}>
+                  {isSubmitting ? 'Verifying MRN...' : 'Access Patient Portal'}
                 </button>
               </form>
-            )}
->>>>>>> 206159d5bef952df153fa24e863b8922cd7de729
-          </div>
+            </div>
+          )
         )}
 
         <div style={{ marginTop: '40px', fontSize: '0.7rem', color: 'var(--text-muted)', borderTop: '1px solid var(--glass-border)', paddingTop: '16px' }}>
