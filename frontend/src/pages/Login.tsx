@@ -175,10 +175,10 @@ export const Login: React.FC = () => {
   const hasClerkKey = !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
   // Sandbox mode mock logins
-  const handleMockClinicianLogin = async (username: string) => {
-    sessionStorage.setItem('medico_portal_type', 'clinician');
-    await loginUser(username);
-  };
+  // const handleMockClinicianLogin = async (username: string) => {
+  //   sessionStorage.setItem('medico_portal_type', 'clinician');
+  //   await loginUser(username);
+  // };
 
   // Clinician Email/Password Login
   const handleClinicianEmailLogin = async (e: React.FormEvent) => {
